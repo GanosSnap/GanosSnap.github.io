@@ -3,203 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dev Portfolio | Game Systems & Logic</title>
+    <title>Dev Portfolio | Project Windows</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --bg: #0f111a;
-            --card-bg: #1a1d2b;
-            --accent: #64ffda; /* Retro terminal teal */
-            --text: #e6edf3;
+            --bg: #0b0d13;
+            --card-bg: #161b22;
+            --accent: #64ffda;
+            --text: #f0f6fc;
             --text-dim: #8b949e;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            line-height: 1.6;
             margin: 0;
-            padding: 0;
+            overflow-x: hidden;
         }
 
         header {
-            padding: 4rem 2rem;
+            padding: 3rem 1rem;
             text-align: center;
-            background: linear-gradient(180deg, #161b22 0%, var(--bg) 100%);
         }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 2rem;
+        h1 { color: var(--accent); font-weight: 800; letter-spacing: -1px; }
+
+        /* The Window Slider */
+        .slider-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 2rem;
+            padding: 2rem;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
 
-        h1 { color: var(--accent); margin-bottom: 0.5rem; }
-        .subtitle { font-size: 1.2rem; color: var(--text-dim); }
+        /* Hide scrollbar but keep functionality */
+        .slider-container::-webkit-scrollbar { display: none; }
 
-        /* Project Gallery Grid */
-        .gallery {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 4rem;
-            padding: 2rem 0;
-        }
-
-        .project-card {
+        .project-window {
+            flex: 0 0 85vw; /* Each window takes 85% of screen width */
+            max-width: 800px;
+            scroll-snap-align: center;
             background: var(--card-bg);
-            border-radius: 12px;
-            overflow: hidden;
+            border-radius: 16px;
             border: 1px solid #30363d;
-            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
-        .project-visual {
+        .visual-area {
             width: 100%;
             aspect-ratio: 16 / 9;
             background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
         }
 
-        .project-visual img, .project-visual video {
+        .visual-area img, .visual-area video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .project-content {
-            padding: 2rem;
+        .content-area {
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-btn {
+            background: none;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent);
+            color: var(--bg);
         }
 
         .tag {
-            background: rgba(100, 255, 218, 0.1);
-            color: var(--accent);
-            padding: 0.2rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin-right: 0.5rem;
-            border: 1px solid var(--accent);
-        }
-
-        .stats { margin: 1rem 0; }
-
-        .deep-dive {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px dashed #30363d;
-        }
-
-        .deep-dive h4 {
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        code {
-            background: #0d1117;
-            padding: 0.2rem 0.4rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            border: 1px solid var(--text-dim);
+            padding: 2px 8px;
             border-radius: 4px;
-            font-family: 'Courier New', Courier, monospace;
-            color: #ff7b72;
-        }
-
-        footer {
-            text-align: center;
-            padding: 4rem;
+            margin-right: 5px;
             color: var(--text-dim);
-            font-size: 0.9rem;
         }
 
-        @media (min-width: 768px) {
-            .gallery { grid-template-columns: 1fr; }
+        .math-box {
+            background: rgba(0,0,0,0.3);
+            border-left: 3px solid var(--accent);
+            padding: 1rem;
+            font-size: 0.9rem;
+            margin-top: 1rem;
         }
+
+        footer { text-align: center; padding: 2rem; color: var(--text-dim); }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="container">
-        <h1>Game Developer & Systems Designer</h1>
-        <p class="subtitle">Focusing on Godot 4, Physics-based Mechanics, and Discrete Math.</p>
-    </div>
+    <h1>Project Gallery</h1>
+    <p>Swipe or use the arrows to cycle through my work</p>
 </header>
 
-<div class="container">
-    <section class="gallery">
-        
-        <article class="project-card">
-            <div class="project-visual">
-                <video autoplay loop muted playsinline>
-                    <source src="metroidbrainia_preview.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
-            <div class="project-content">
-                <div class="stats">
-                    <span class="tag">Godot 4</span>
-                    <span class="tag">Systemic Design</span>
-                </div>
-                <h3>Knowledge-Gated 2D Metroidbrainia</h3>
-                <p>A project inspired by <em>Animal Well</em>, focusing on environmental interaction and persistent physics rules rather than traditional combat.</p>
-                
-                <div class="deep-dive">
-                    <h4><i class="fas fa-microchip"></i> The Technical Learnings</h4>
-                    <p>Designed a <strong>robust player state machine</strong> to handle emergent tool interactions. The challenge was ensuring that knowledge-based gates felt rewarding and consistent across different 2D physics layers.</p>
-                </div>
-            </div>
-        </article>
+<div class="controls">
+    <button class="nav-btn" onclick="document.querySelector('.slider-container').scrollBy({left: -400})">
+        <i class="fas fa-arrow-left"></i> Previous
+    </button>
+    <button class="nav-btn" onclick="document.querySelector('.slider-container').scrollBy({left: 400})">
+        Next <i class="fas fa-arrow-right"></i>
+    </button>
+</div>
 
-        <article class="project-card">
-            <div class="project-visual">
-                <img src="grass_shader_demo.gif" alt="2D Wind Shader Demo">
-            </div>
-            <div class="project-content">
-                <div class="stats">
-                    <span class="tag">GLSL / Shaders</span>
-                    <span class="tag">Optimization</span>
-                </div>
-                <h3>Dynamic 2D Wind & Foliage System</h3>
-                <p>A global wind system using noise textures to drive vertex displacement across all environmental sprites.</p>
-                
-                <div class="deep-dive">
-                    <h4><i class="fas fa-code-branch"></i> The Technical Learnings</h4>
-                    <p>Mastered <strong>UV-space manipulation</strong> and global uniforms. Learned how to pass <code>sampler2D</code> wind maps to multiple materials efficiently to keep draw calls low while maintaining a "high-end" environmental feel.</p>
-                </div>
-            </div>
-        </article>
+<div class="slider-container">
 
-        <article class="project-card">
-            <div class="project-visual">
-                <img src="gravity_demo.gif" alt="Planetary Gravity Demo">
+    <div class="project-window">
+        <div class="visual-area">
+            <video autoplay loop muted playsinline><source src="metroid.mp4" type="video/mp4"></video>
+        </div>
+        <div class="content-area">
+            <span class="tag">Systemic Design</span><span class="tag">Godot 4</span>
+            <h2>2D Metroidbrainia</h2>
+            <p>Knowledge-gated progression inspired by <em>Animal Well</em>.</p>
+            <div class="math-box">
+                <strong>Technical Insight:</strong> Implemented a "World State Manager" that tracks player knowledge rather than item inventory to unlock areas.
             </div>
-            <div class="project-content">
-                <div class="stats">
-                    <span class="tag">Linear Algebra</span>
-                    <span class="tag">C++ / GDScript</span>
-                </div>
-                <h3>Custom Planetary Gravity Engine</h3>
-                <p>Implementation of <em>Mario Galaxy</em> style gravity, allowing for arbitrary "down" vectors on complex geometry.</p>
-                
-                <div class="deep-dive">
-                    <h4><i class="fas fa-square-root-alt"></i> The Technical Learnings</h4>
-                    <p>Applied <strong>Linear Algebra</strong> to calculate dynamic basis vectors. Researched C++ decompilations of classic engines to understand how to smoothly interpolate camera quaternions during gravity shifts.</p>
-                </div>
-            </div>
-        </article>
+        </div>
+    </div>
 
-    </section>
+    <div class="project-window">
+        <div class="visual-area">
+            <img src="grass.gif" alt="Grass Shader">
+        </div>
+        <div class="content-area">
+            <span class="tag">GLSL</span><span class="tag">VFX</span>
+            <h2>Global Wind Shader</h2>
+            <p>A procedural 2D grass system using vertex displacement.</p>
+            <div class="math-box">
+                <strong>Technical Insight:</strong> Utilized a global noise texture to synchronize movement across multiple scene layers without performance drops.
+            </div>
+        </div>
+    </div>
+
+    <div class="project-window">
+        <div class="visual-area">
+            <video autoplay loop muted playsinline><source src="gravity.mp4" type="video/mp4"></video>
+        </div>
+        <div class="content-area">
+            <span class="tag">Math</span><span class="tag">Physics</span>
+            <h2>Planetary Gravity</h2>
+            <p>Non-standard gravity mechanics adapted from <em>Mario Galaxy</em>.</p>
+            <div class="math-box">
+                <strong>Technical Insight:</strong> Overrode Godot’s default gravity vector using <code>_integrate_forces</code> and custom Linear Algebra.
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <footer>
-    <div class="container">
-        <p>&copy; 2026 | Built with logic and Godot.</p>
-        <p><a href="https://github.com/yourusername" style="color: var(--accent);">GitHub</a> • <a href="https://itch.io" style="color: var(--accent);">Itch.io</a></p>
-    </div>
+    <p>Scroll horizontally to view more • <a href="#" style="color:var(--accent)">GitHub</a></p>
 </footer>
 
 </body>
