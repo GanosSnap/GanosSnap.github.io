@@ -3,186 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dev Portfolio | Project Windows</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Systems Interface | Holographic Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0b0d13;
-            --card-bg: #161b22;
-            --accent: #64ffda;
-            --text: #f0f6fc;
-            --text-dim: #8b949e;
+            --base-bg: #030407; /* Depths of the machine */
+            --floor: #0c0e14; /* Metallic floor */
+            --light-source: #00f3ff; /* Hologram blue */
+            --light-glow: rgba(0, 243, 255, 0.4);
+            --interface-text: #64ffda;
+            --font-main: 'Chakra Petch', sans-serif; /* A great sci-fi font */
         }
 
         body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: var(--font-main);
+            background-color: var(--base-bg);
+            background-image: 
+                radial-gradient(var(--floor) 1px, transparent 1px);
+            background-size: 30px 30px; /* Grid on the floor */
+            color: var(--interface-text);
             margin: 0;
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         header {
-            padding: 3rem 1rem;
             text-align: center;
-        }
-
-        h1 { color: var(--accent); font-weight: 800; letter-spacing: -1px; }
-
-        /* The Window Slider */
-        .slider-container {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            gap: 2rem;
             padding: 2rem;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
+            position: relative;
+            z-index: 10;
         }
 
-        /* Hide scrollbar but keep functionality */
-        .slider-container::-webkit-scrollbar { display: none; }
+        h1 {
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            text-shadow: 0 0 10px var(--light-source), 0 0 20px var(--light-source);
+        }
 
-        .project-window {
-            flex: 0 0 85vw; /* Each window takes 85% of screen width */
-            max-width: 800px;
+        /* --- THE STAGE --- */
+        /* Perspective is essential for 3D positioning */
+        .stage-view {
+            perspective: 2000px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            flex-grow: 1;
+            width: 100%;
+            position: relative;
+            margin-bottom: 5vh;
+        }
+
+        /* The horizontal list that holds all projectors */
+        .projector-array {
+            display: flex;
+            gap: 100px; /* Large space between projectors */
+            padding: 0 50vw; /* Needed to center the active projector */
+            overflow-x: scroll;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+        }
+
+        /* Hide scrollbar */
+        .projector-array::-webkit-scrollbar { display: none; }
+
+        /* --- THE INDIVIDUAL PROJECTOR & HOLOGRAM UNITS --- */
+        .projector-unit {
             scroll-snap-align: center;
-            background: var(--card-bg);
-            border-radius: 16px;
-            border: 1px solid #30363d;
+            flex: 0 0 350px; /* Width of the projector */
+            position: relative;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            align-items: center;
+            /* Give it 3D space */
+            transform-style: preserve-3d;
+            transform-origin: bottom center;
+            cursor: pointer;
         }
 
-        .visual-area {
-            width: 100%;
-            aspect-ratio: 16 / 9;
+        /* --- THE HOLOGRAM (Active State) --- */
+        .hologram {
+            width: 320px;
+            aspect-ratio: 16/9;
             background: #000;
+            border: 2px solid var(--light-source);
+            box-shadow: 0 0 15px var(--light-glow), inset 0 0 15px var(--light-glow);
+            
+            /* HOLOGRAPHIC POSITION (Floating, slightly tilted) */
+            position: absolute;
+            bottom: 60px; /* Height above the projector */
+            opacity: 0.1; /* Almost invisible when not centered */
+            
+            /* Crucial positioning for 3D feel */
+            transform: rotateX(15deg) translateY(0px) translateZ(0px);
+            transition: all 0.5s ease-out;
+            
+            /* Apply filters to create "light projection" effect */
+            filter: sepia(100%) hue-rotate(170deg) saturate(300%) contrast(150%);
+            mix-blend-mode: screen; /* Makes black video background transparent */
         }
 
-        .visual-area img, .visual-area video {
+        /* The actual media container (flicker overlay) */
+        .hologram-media {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hologram-media::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0px, transparent 2px);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .hologram img, .hologram video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .content-area {
-            padding: 1.5rem;
-            flex-grow: 1;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            padding: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .nav-btn {
-            background: none;
-            border: 2px solid var(--accent);
-            color: var(--accent);
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .nav-btn:hover {
-            background: var(--accent);
-            color: var(--bg);
-        }
-
-        .tag {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            border: 1px solid var(--text-dim);
-            padding: 2px 8px;
+        /* --- THE PROJECTOR BASE --- */
+        .projector-base {
+            width: 120px;
+            height: 20px;
+            background: #111;
+            border: 2px solid #333;
             border-radius: 4px;
-            margin-right: 5px;
-            color: var(--text-dim);
+            position: relative;
+            transform: rotateX(-30deg); /* Lays flat on floor perspective */
+            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+            z-index: 1;
         }
 
-        .math-box {
-            background: rgba(0,0,0,0.3);
-            border-left: 3px solid var(--accent);
+        /* The glowing lens */
+        .projector-base::after {
+            content: "";
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%; height: 60%;
+            background: var(--light-source);
+            border-radius: 50%;
+            filter: blur(5px);
+            box-shadow: 0 0 15px var(--light-source);
+        }
+
+        /* The cone of light emanating upward */
+        .light-cone {
+            position: absolute;
+            bottom: 20px; /* Sits on projector */
+            width: 100px;
+            height: 0px; /* Active state only */
+            background: linear-gradient(0deg, var(--light-source) 0%, transparent 80%);
+            opacity: 0.3;
+            clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
+            filter: blur(5px);
+            transition: height 0.5s ease-out;
+        }
+
+        /* --- PROJECT DETAILS (Below projector) --- */
+        .project-details {
+            margin-top: 50px;
+            text-align: center;
+            color: #ccc;
+            font-size: 0.8rem;
+            max-width: 250px;
+            line-height: 1.4;
+            opacity: 0.5;
+            transition: opacity 0.5s ease;
+        }
+
+        /* --- THE "ACTIVE" HOLOGRAM STATE (CENTERED IN VIEW) --- */
+        /* This is managed by a small JS script below */
+        .projector-unit.active .hologram {
+            opacity: 1;
+            bottom: 80px; /* Floats higher */
+            transform: rotateX(5deg) translateY(-20px) translateZ(100px); /* Pops out in 3D */
+            animation: hologram-float 4s ease-in-out infinite, hologram-flicker 0.2s infinite;
+        }
+        
+        .projector-unit.active .light-cone {
+            height: 100px;
+        }
+
+        .projector-unit.active .project-details {
+            opacity: 1;
+            color: #fff;
+        }
+
+        /* --- Keyframes for effects --- */
+        @keyframes hologram-float {
+            0%, 100% { transform: rotateX(5deg) translateY(-20px) translateZ(100px); }
+            50% { transform: rotateX(8deg) translateY(-30px) translateZ(100px); }
+        }
+
+        @keyframes hologram-flicker {
+            0% { opacity: 0.95; }
+            5% { opacity: 0.85; }
+            10% { opacity: 1; }
+            100% { opacity: 1; }
+        }
+
+        footer {
+            text-align: center;
             padding: 1rem;
-            font-size: 0.9rem;
-            margin-top: 1rem;
+            color: #444;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
         }
 
-        footer { text-align: center; padding: 2rem; color: var(--text-dim); }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Project Gallery</h1>
-    <p>Swipe or use the arrows to cycle through my work</p>
+    <h1>Project Archives</h1>
+    <p>> Cycle between terminals for technical logs</p>
 </header>
 
-<div class="controls">
-    <button class="nav-btn" onclick="document.querySelector('.slider-container').scrollBy({left: -400})">
-        <i class="fas fa-arrow-left"></i> Previous
-    </button>
-    <button class="nav-btn" onclick="document.querySelector('.slider-container').scrollBy({left: 400})">
-        Next <i class="fas fa-arrow-right"></i>
-    </button>
-</div>
+<div class="stage-view">
+    <div class="projector-array" id="projectorArray">
 
-<div class="slider-container">
-
-    <div class="project-window">
-        <div class="visual-area">
-            <video autoplay loop muted playsinline><source src="metroid.mp4" type="video/mp4"></video>
-        </div>
-        <div class="content-area">
-            <span class="tag">Systemic Design</span><span class="tag">Godot 4</span>
-            <h2>2D Metroidbrainia</h2>
-            <p>Knowledge-gated progression inspired by <em>Animal Well</em>.</p>
-            <div class="math-box">
-                <strong>Technical Insight:</strong> Implemented a "World State Manager" that tracks player knowledge rather than item inventory to unlock areas.
+        <div class="projector-unit">
+            <div class="hologram">
+                <div class="hologram-media">
+                    <video autoplay loop muted playsinline><source src="metroid.mp4" type="video/mp4"></video>
+                </div>
+            </div>
+            <div class="light-cone"></div>
+            <div class="projector-base"></div>
+            <div class="project-details">
+                <h3>METROIDBRAINIA PROTOTYPE</h3>
+                <p>Focus: Systemic design & Knowledge-gating logic.</p>
+                <small>Engine: Godot 4.3</small>
             </div>
         </div>
-    </div>
 
-    <div class="project-window">
-        <div class="visual-area">
-            <img src="grass.gif" alt="Grass Shader">
-        </div>
-        <div class="content-area">
-            <span class="tag">GLSL</span><span class="tag">VFX</span>
-            <h2>Global Wind Shader</h2>
-            <p>A procedural 2D grass system using vertex displacement.</p>
-            <div class="math-box">
-                <strong>Technical Insight:</strong> Utilized a global noise texture to synchronize movement across multiple scene layers without performance drops.
+        <div class="projector-unit">
+            <div class="hologram">
+                <div class="hologram-media">
+                    <img src="grass.gif" alt="Shader Demo">
+                </div>
+            </div>
+            <div class="light-cone"></div>
+            <div class="projector-base"></div>
+            <div class="project-details">
+                <h3>GLSL SHADER SUITE</h3>
+                <p>Focus: Global vertex noise optimization.</p>
+                <small>Language: GLSL / Godot Shading</small>
             </div>
         </div>
-    </div>
 
-    <div class="project-window">
-        <div class="visual-area">
-            <video autoplay loop muted playsinline><source src="gravity.mp4" type="video/mp4"></video>
-        </div>
-        <div class="content-area">
-            <span class="tag">Math</span><span class="tag">Physics</span>
-            <h2>Planetary Gravity</h2>
-            <p>Non-standard gravity mechanics adapted from <em>Mario Galaxy</em>.</p>
-            <div class="math-box">
-                <strong>Technical Insight:</strong> Overrode Godot’s default gravity vector using <code>_integrate_forces</code> and custom Linear Algebra.
+        <div class="projector-unit">
+            <div class="hologram">
+                <div class="hologram-media">
+                    <video autoplay loop muted playsinline><source src="gravity.mp4" type="video/mp4"></video>
+                </div>
+            </div>
+            <div class="light-cone"></div>
+            <div class="projector-base"></div>
+            <div class="project-details">
+                <h3>ORBITAL SYSTEMS</h3>
+                <p>Focus: Advanced Linear Algebra for non-standard gravity.</p>
+                <small>Role: Physics Programming</small>
             </div>
         </div>
+        
     </div>
-
 </div>
 
 <footer>
-    <p>Scroll horizontally to view more • <a href="#" style="color:var(--accent)">GitHub</a></p>
+    <p>INTERFACE V1.0 | ENCRYPTED LINK | HOSTING... </p>
 </footer>
+
+<script>
+    const array = document.getElementById('projectorArray');
+    const units = document.querySelectorAll('.projector-unit');
+
+    // Threshold ensures the 'pop up' happens when centered
+    const threshold = 0.5;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            } else {
+                entry.target.classList.remove('active');
+            }
+        });
+    }, {
+        root: array,
+        threshold: 0.6 // How "centered" it must be to acticate
+    });
+
+    units.forEach(unit => {
+        observer.observe(unit);
+    });
+</script>
 
 </body>
 </html>
