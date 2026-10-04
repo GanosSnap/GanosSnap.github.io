@@ -3,244 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Theatre Technical Gallery</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
+    <title>Arthur Abramyan | Systems & Game Software Engineer</title>
     <style>
         :root {
-            --stage-dark: #050505;
-            --spotlight: rgba(255, 255, 255, 0.08);
-            --accent-steel: #a0a0a0;
-            --text-main: #d1d1d1;
-            --font-mono: 'Space Mono', monospace;
+            --bg-primary: #0a0c10;
+            --bg-secondary: #12161f;
+            --bg-card: #181d28;
+            --border-color: #272f3f;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --accent-glow: rgba(88, 166, 255, 0.15);
+            --code-bg: #0d1117;
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: var(--font-mono);
-            background-color: var(--stage-dark);
+            background-color: var(--bg-primary);
             color: var(--text-main);
-            margin: 0;
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--accent);
+            font-family: var(--font-mono);
+            margin-top: 0.25rem;
+        }
+
+        .bio {
+            margin-top: 1rem;
+            color: var(--text-muted);
+            max-width: 750px;
+        }
+
+        .links {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .links a:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        /* Filter Tags */
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.4rem 0.9rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        /* Project Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            transition: transform 0.2s ease, border-color 0.2s ease;
         }
 
-        /* --- THE THEATRE STAGE --- */
-        .theatre-floor {
-            position: absolute;
-            bottom: 0;
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+        }
+
+        .card-preview {
             width: 100%;
-            height: 35vh;
-            background: #0a0a0a;
-            border-top: 1px solid #1a1a1a;
-            box-shadow: inset 0 20px 50px #000;
-            z-index: 1;
-        }
-
-        .stage-view {
-            perspective: 1200px;
+            height: 180px;
+            background: var(--code-bg);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            flex-grow: 1;
-            width: 100%;
-            position: relative;
-            z-index: 2;
-            padding-bottom: 10vh;
-        }
-
-        .projector-array {
-            display: flex;
-            gap: 150px;
-            padding: 0 50vw;
-            overflow-x: scroll;
-            scroll-snap-type: x mandatory;
-            scroll-behavior: smooth;
-            height: 80vh;
-            align-items: flex-end;
-        }
-
-        .projector-array::-webkit-scrollbar { display: none; }
-
-        /* --- THE PROJECTOR UNIT --- */
-        .projector-unit {
-            scroll-snap-align: center;
-            flex: 0 0 400px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            justify-content: center;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
         }
 
-        /* --- THE PROJECTION (THE "HOLOGRAM") --- */
-        .projection-screen {
-            width: 380px;
-            aspect-ratio: 16/9;
-            background: #000;
-            border: 1px solid #333;
-            position: relative;
-            transform: translateZ(-50px) translateY(20px);
-            opacity: 0.2;
-            transition: all 0.6s ease;
-            overflow: hidden;
+        .card-body {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
         }
 
-        /* Scanline Overlay for a "Projected" look */
-        .projection-screen::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 3px, 3px 100%;
-            z-index: 2;
-            pointer-events: none;
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
         }
 
-        .projection-screen img, .projection-screen video {
+        .card-description {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            color: var(--accent);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 3px;
+        }
+
+        .card-btn {
+            align-self: start;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .card-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Modal Details Window */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            filter: grayscale(20%) contrast(1.1);
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 100;
         }
 
-        /* --- THE SPOTLIGHT CONE --- */
-        .spotlight-cone {
-            position: absolute;
-            bottom: 0;
-            width: 300px;
-            height: 500px;
-            background: conic-gradient(from 165deg at 50% 100%, var(--spotlight) 0deg, transparent 30deg, transparent 330deg, var(--spotlight) 360deg);
-            filter: blur(15px);
-            opacity: 0;
-            transition: opacity 0.6s ease;
-            pointer-events: none;
+        .modal-backdrop.active {
+            display: flex;
         }
 
-        /* --- MECHANICAL BASE --- */
-        .projector-base {
-            width: 80px;
-            height: 12px;
-            background: #151515;
-            border: 1px solid #252525;
-            margin-top: 10px;
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
             position: relative;
-            z-index: 3;
         }
 
-        /* --- ACTIVE STATE --- */
-        .projector-unit.active {
-            transform: translateZ(150px) translateY(-30px);
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
         }
 
-        .projector-unit.active .projection-screen {
-            opacity: 1;
-            transform: translateZ(0) translateY(0);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-            border-color: #555;
+        .modal-close:hover {
+            color: var(--accent);
         }
 
-        .projector-unit.active .spotlight-cone {
-            opacity: 1;
-        }
-
-        /* --- INFO PANEL --- */
-        .info-panel {
-            margin-top: 40px;
-            text-align: center;
-            width: 300px;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.6s ease;
-        }
-
-        .projector-unit.active .info-panel {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        h2 { font-size: 1rem; text-transform: uppercase; margin-bottom: 5px; color: #fff; }
-        p { font-size: 0.75rem; color: #888; margin: 0; }
-
-        .nav-hint {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.7rem;
-            color: #444;
-            z-index: 10;
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin-top: 1rem;
+            color: #d2a8ff;
         }
     </style>
 </head>
 <body>
 
-<div class="theatre-floor"></div>
-
-<div class="stage-view">
-    <div class="projector-array" id="projectorArray">
-
-        <div class="projector-unit">
-            <div class="projection-screen">
-                <video autoplay loop muted playsinline><source src="metroid.mp4" type="video/mp4"></video>
-            </div>
-            <div class="spotlight-cone"></div>
-            <div class="projector-base"></div>
-            <div class="info-panel">
-                <h2>Metroidbrainia Engine</h2>
-                <p>Knowledge-gated systemic simulation.</p>
-            </div>
+<div class="container">
+    <header>
+        <h1>Arthur Abramyan</h1>
+        <div class="subtitle">Computer Science & Systems Software Engineer</div>
+        <p class="bio">
+            Specializing in low-level systems programming (C++), deterministic embedded software/aerospace frameworks, hardware interface telemetry, and real-time graphics/Godot engine mechanics.
+        </p>
+        <div class="links">
+            <a href="https://github.com" target="_blank">GitHub</a>
+            <a href="mailto:email@example.com">Contact Email</a>
+            <a href="#">Resume (PDF)</a>
         </div>
+    </header>
 
-        <div class="projector-unit">
-            <div class="projection-screen">
-                <img src="grass.gif" alt="Shader Logic">
-            </div>
-            <div class="spotlight-cone"></div>
-            <div class="projector-base"></div>
-            <div class="info-panel">
-                <h2>Procedural Grass</h2>
-                <p>Vertex noise displacement via Godot 4.</p>
-            </div>
-        </div>
+    <div class="controls">
+        <button class="filter-btn active" onclick="filterProjects('all')">All Work</button>
+        <button class="filter-btn" onclick="filterProjects('systems')">Systems & Embedded</button>
+        <button class="filter-btn" onclick="filterProjects('gamedev')">Graphics & Game Engines</button>
+        <button class="filter-btn" onclick="filterProjects('web')">Web & Tools</button>
+    </div>
 
-        <div class="projector-unit">
-            <div class="projection-screen">
-                <video autoplay loop muted playsinline><source src="gravity.mp4" type="video/mp4"></video>
-            </div>
-            <div class="spotlight-cone"></div>
-            <div class="projector-base"></div>
-            <div class="info-panel">
-                <h2>Planetary Gravity</h2>
-                <p>Custom C++ physics integration.</p>
-            </div>
-        </div>
+    <div class="grid" id="projectGrid"></div>
+</div>
 
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="hideModal()">&times;</button>
+        <h2 id="modalTitle" style="margin-bottom: 0.5rem;"></h2>
+        <div id="modalTags" class="tech-stack"></div>
+        <p id="modalDescription" style="color: var(--text-muted); margin-top: 1rem;"></p>
+        <div id="modalCode"></div>
     </div>
 </div>
 
-<div class="nav-hint">SCROLL HORIZONTALLY TO CYCLE PROJECTS</div>
-
 <script>
-    const array = document.getElementById('projectorArray');
-    const units = document.querySelectorAll('.projector-unit');
+    const projects = [
+        {
+            id: "fprime-flight",
+            category: "systems",
+            title: "Embedded Satellite Telemetry Component",
+            shortDesc: "NASA F Prime component architecture built in C++ for deterministic flight software telemetry logging.",
+            tags: ["C++", "NASA F Prime", "Embedded Systems", "Linux"],
+            fullDesc: "Designed and integrated custom telemetry-handling components into NASA's F Prime framework. Implemented thread-safe queueing for ground command deserialization and deterministic rate-group execution.",
+            codeSnippet: `// F Prime Telemetry Port Handler\nvoid TelemetryComponent :: runHandler(const NATIVE_INT_TYPE portNum, U32 val) {\n    FW_ASSERT(portNum < NUM_RUN_INPUT_PORTS);\n    this->tlmWrite_PacketsSent(val);\n}`
+        },
+        {
+            id: "dc-sensor-pcb",
+            category: "systems",
+            title: "DC High-Current Sensing Board & Firmware",
+            shortDesc: "Custom PCB design using Hall-effect sensing coupled with C++ firmware for real-time EV current monitoring.",
+            tags: ["C++", "KiCad", "Embedded Hardware", "UART"],
+            fullDesc: "Engineered hardware schematics and low-level firmware for continuous direct current measurements across 15V power paths using a precision shunt and analog signal conditioning.",
+            codeSnippet: `// Sensor Sampling ADC Loop\nfloat read_dc_amps() {\n    uint16_t raw_adc = analogRead(CURRENT_PIN);\n    float voltage = (raw_adc / 4095.0f) * VREF;\n    return (voltage - V_OFFSET) / SENSITIVITY;\n}`
+        },
+        {
+            id: "godot-water-shader",
+            category: "gamedev",
+            title: "Stylized 3D Spatial Water Shader",
+            shortDesc: "Custom spatial shader in Godot 4 utilizing vertex wave displacement, depth fade, and dynamic foam generation.",
+            tags: ["Godot 4", "GDScript", "GLSL Shaders", "3D Graphics"],
+            fullDesc: "Implemented a custom spatial wave displacement shader utilizing linear depth sampling from the depth buffer to generate edge foam contacts and smooth shoreline blending.",
+            codeSnippet: `shader_type spatial;\nrender_mode depth_draw_always, cull_back;\n\nuniform sampler2D DEPTH_TEXTURE : hint_depth_texture;\nvoid fragment() {\n    float depth = texture(DEPTH_TEXTURE, SCREEN_UV).r;\n    // Shoreline intersection calculation...\n}`
+        },
+        {
+            id: "merchant-sim",
+            category: "gamedev",
+            title: "Data-Driven Market Engine & Game",
+            shortDesc: "Economic simulation game featuring custom ItemData resources and dynamic price-fluctuation state machines.",
+            tags: ["Godot 4", "GDScript", "Architecture", "Game Design"],
+            fullDesc: "Constructed an item management system using custom Godot Resource wrappers (`ItemData`) to decouple market engine data handling from UI rendering components.",
+            codeSnippet: `class_name ItemData extends Resource\n\n@export var item_id: String\n@export var base_value: float\n@export var volatility: float`
+        }
+    ];
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-            } else {
-                entry.target.classList.remove('active');
-            }
-        });
-    }, {
-        root: array,
-        threshold: 0.7
-    });
+    function renderProjects(items) {
+        const grid = document.getElementById('projectGrid');
+        grid.innerHTML = items.map(p => `
+            <div class="card">
+                <div class="card-preview">&lt;/&gt; ${p.tags[0]} Showcase</div>
+                <div class="card-body">
+                    <h3 class="card-title">${p.title}</h3>
+                    <p class="card-description">${p.shortDesc}</p>
+                    <div class="tech-stack">
+                        ${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+                    </div>
+                    <button class="card-btn" onclick="openModal('${p.id}')">View Details &rarr;</button>
+                </div>
+            </div>
+        `).join('');
+    }
 
-    units.forEach(unit => observer.observe(unit));
+    function filterProjects(category) {
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        if (category === 'all') {
+            renderProjects(projects);
+        } else {
+            renderProjects(projects.filter(p => p.category === category));
+        }
+    }
+
+    function openModal(id) {
+        const p = projects.find(item => item.id === id);
+        if (!p) return;
+
+        document.getElementById('modalTitle').innerText = p.title;
+        document.getElementById('modalTags').innerHTML = p.tags.map(t => `<span class="tag">${t}</span>`).join('');
+        document.getElementById('modalDescription').innerText = p.fullDesc;
+        document.getElementById('modalCode').innerHTML = p.codeSnippet ? `<pre><code>${escapeHtml(p.codeSnippet)}</code></pre>` : '';
+        document.getElementById('modalBackdrop').classList.add('active');
+    }
+
+    function hideModal() {
+        document.getElementById('modalBackdrop').classList.remove('active');
+    }
+
+    function closeModal(e) {
+        if (e.target.id === 'modalBackdrop') hideModal();
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Initial Render
+    renderProjects(projects);
 </script>
 
 </body>
