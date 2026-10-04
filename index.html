@@ -86,7 +86,7 @@
             background: var(--accent-glow);
         }
 
-        /* Filter Tags */
+        /* Filter Controls */
         .controls {
             display: flex;
             gap: 0.5rem;
@@ -139,12 +139,15 @@
             height: 180px;
             background: var(--code-bg);
             border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-preview img, .card-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .card-body {
@@ -208,7 +211,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             display: none;
             align-items: center;
             justify-content: center;
@@ -247,6 +250,24 @@
             color: var(--accent);
         }
 
+        .modal-media {
+            margin-top: 1rem;
+            width: 100%;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-media img, .modal-media video {
+            max-width: 100%;
+            max-height: 420px;
+            object-fit: contain;
+            display: block;
+        }
+
         pre {
             background: var(--code-bg);
             border: 1px solid var(--border-color);
@@ -267,7 +288,7 @@
         <h1>Arthur Abramyan</h1>
         <div class="subtitle">Computer Science & Systems Software Engineer</div>
         <p class="bio">
-            Specializing in low-level systems programming (C++), deterministic embedded software/aerospace frameworks, hardware interface telemetry, and real-time graphics/Godot engine mechanics.
+            Specializing in low-level systems programming (C++), deterministic flight software architectures, hardware telemetry, and real-time graphics/Godot engine mechanics.
         </p>
         <div class="links">
             <a href="https://github.com" target="_blank">GitHub</a>
@@ -277,10 +298,9 @@
     </header>
 
     <div class="controls">
-        <button class="filter-btn active" onclick="filterProjects('all')">All Work</button>
-        <button class="filter-btn" onclick="filterProjects('systems')">Systems & Embedded</button>
-        <button class="filter-btn" onclick="filterProjects('gamedev')">Graphics & Game Engines</button>
-        <button class="filter-btn" onclick="filterProjects('web')">Web & Tools</button>
+        <button class="filter-btn active" onclick="filterProjects('all', event)">All Work</button>
+        <button class="filter-btn" onclick="filterProjects('systems', event)">Systems & Embedded</button>
+        <button class="filter-btn" onclick="filterProjects('gamedev', event)">Graphics & Game Engines</button>
     </div>
 
     <div class="grid" id="projectGrid"></div>
@@ -291,6 +311,7 @@
         <button class="modal-close" onclick="hideModal()">&times;</button>
         <h2 id="modalTitle" style="margin-bottom: 0.5rem;"></h2>
         <div id="modalTags" class="tech-stack"></div>
+        <div id="modalMedia" class="modal-media"></div>
         <p id="modalDescription" style="color: var(--text-muted); margin-top: 1rem;"></p>
         <div id="modalCode"></div>
     </div>
@@ -299,12 +320,27 @@
 <script>
     const projects = [
         {
+            id: "godot-water-shader",
+            category: "gamedev",
+            title: "Stylized 3D Spatial Water Shader",
+            shortDesc: "Custom spatial shader in Godot 4 utilizing vertex wave displacement, depth fade, and dynamic foam generation.",
+            tags: ["Godot 4", "GDScript", "GLSL Shaders", "3D Graphics"],
+            fullDesc: "Implemented a custom spatial wave displacement shader utilizing linear depth sampling from the depth buffer to generate edge foam contacts and smooth shoreline blending.",
+            mediaType: "video",
+            mediaSrc: "assets/shaders/water_demo.mp4",
+            thumbnail: "assets/shaders/water_thumb.png",
+            codeSnippet: `shader_type spatial;\nrender_mode depth_draw_always, cull_back;\n\nuniform sampler2D DEPTH_TEXTURE : hint_depth_texture;\nvoid fragment() {\n    float depth = texture(DEPTH_TEXTURE, SCREEN_UV).r;\n    // Shoreline intersection calculation...\n}`
+        },
+        {
             id: "fprime-flight",
             category: "systems",
             title: "Embedded Satellite Telemetry Component",
             shortDesc: "NASA F Prime component architecture built in C++ for deterministic flight software telemetry logging.",
             tags: ["C++", "NASA F Prime", "Embedded Systems", "Linux"],
             fullDesc: "Designed and integrated custom telemetry-handling components into NASA's F Prime framework. Implemented thread-safe queueing for ground command deserialization and deterministic rate-group execution.",
+            mediaType: "image",
+            mediaSrc: "assets/diagrams/fprime_architecture.png",
+            thumbnail: "assets/diagrams/fprime_architecture.png",
             codeSnippet: `// F Prime Telemetry Port Handler\nvoid TelemetryComponent :: runHandler(const NATIVE_INT_TYPE portNum, U32 val) {\n    FW_ASSERT(portNum < NUM_RUN_INPUT_PORTS);\n    this->tlmWrite_PacketsSent(val);\n}`
         },
         {
@@ -314,16 +350,10 @@
             shortDesc: "Custom PCB design using Hall-effect sensing coupled with C++ firmware for real-time EV current monitoring.",
             tags: ["C++", "KiCad", "Embedded Hardware", "UART"],
             fullDesc: "Engineered hardware schematics and low-level firmware for continuous direct current measurements across 15V power paths using a precision shunt and analog signal conditioning.",
+            mediaType: "image",
+            mediaSrc: "assets/pcb/board_layout.png",
+            thumbnail: "assets/pcb/board_layout.png",
             codeSnippet: `// Sensor Sampling ADC Loop\nfloat read_dc_amps() {\n    uint16_t raw_adc = analogRead(CURRENT_PIN);\n    float voltage = (raw_adc / 4095.0f) * VREF;\n    return (voltage - V_OFFSET) / SENSITIVITY;\n}`
-        },
-        {
-            id: "godot-water-shader",
-            category: "gamedev",
-            title: "Stylized 3D Spatial Water Shader",
-            shortDesc: "Custom spatial shader in Godot 4 utilizing vertex wave displacement, depth fade, and dynamic foam generation.",
-            tags: ["Godot 4", "GDScript", "GLSL Shaders", "3D Graphics"],
-            fullDesc: "Implemented a custom spatial wave displacement shader utilizing linear depth sampling from the depth buffer to generate edge foam contacts and smooth shoreline blending.",
-            codeSnippet: `shader_type spatial;\nrender_mode depth_draw_always, cull_back;\n\nuniform sampler2D DEPTH_TEXTURE : hint_depth_texture;\nvoid fragment() {\n    float depth = texture(DEPTH_TEXTURE, SCREEN_UV).r;\n    // Shoreline intersection calculation...\n}`
         },
         {
             id: "merchant-sim",
@@ -332,28 +362,44 @@
             shortDesc: "Economic simulation game featuring custom ItemData resources and dynamic price-fluctuation state machines.",
             tags: ["Godot 4", "GDScript", "Architecture", "Game Design"],
             fullDesc: "Constructed an item management system using custom Godot Resource wrappers (`ItemData`) to decouple market engine data handling from UI rendering components.",
+            mediaType: "video",
+            mediaSrc: "assets/merchant/gameplay.mp4",
+            thumbnail: "assets/merchant/thumb.png",
             codeSnippet: `class_name ItemData extends Resource\n\n@export var item_id: String\n@export var base_value: float\n@export var volatility: float`
         }
     ];
 
     function renderProjects(items) {
         const grid = document.getElementById('projectGrid');
-        grid.innerHTML = items.map(p => `
-            <div class="card">
-                <div class="card-preview">&lt;/&gt; ${p.tags[0]} Showcase</div>
-                <div class="card-body">
-                    <h3 class="card-title">${p.title}</h3>
-                    <p class="card-description">${p.shortDesc}</p>
-                    <div class="tech-stack">
-                        ${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+        grid.innerHTML = items.map(p => {
+            let previewMedia = '';
+            if (p.thumbnail) {
+                previewMedia = `<img src="${p.thumbnail}" alt="${p.title}">`;
+            } else if (p.mediaType === 'video') {
+                previewMedia = `<video src="${p.mediaSrc}" autoplay loop muted playsinline></video>`;
+            } else if (p.mediaType === 'image') {
+                previewMedia = `<img src="${p.mediaSrc}" alt="${p.title}">`;
+            } else {
+                previewMedia = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-family:var(--font-mono);">&lt;/&gt; Preview</div>`;
+            }
+
+            return `
+                <div class="card">
+                    <div class="card-preview">${previewMedia}</div>
+                    <div class="card-body">
+                        <h3 class="card-title">${p.title}</h3>
+                        <p class="card-description">${p.shortDesc}</p>
+                        <div class="tech-stack">
+                            ${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+                        </div>
+                        <button class="card-btn" onclick="openModal('${p.id}')">View Details &rarr;</button>
                     </div>
-                    <button class="card-btn" onclick="openModal('${p.id}')">View Details &rarr;</button>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
-    function filterProjects(category) {
+    function filterProjects(category, event) {
         document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
 
@@ -372,11 +418,27 @@
         document.getElementById('modalTags').innerHTML = p.tags.map(t => `<span class="tag">${t}</span>`).join('');
         document.getElementById('modalDescription').innerText = p.fullDesc;
         document.getElementById('modalCode').innerHTML = p.codeSnippet ? `<pre><code>${escapeHtml(p.codeSnippet)}</code></pre>` : '';
+
+        const mediaContainer = document.getElementById('modalMedia');
+        if (p.mediaType === 'video') {
+            mediaContainer.innerHTML = `<video src="${p.mediaSrc}" controls autoplay></video>`;
+            mediaContainer.style.display = 'flex';
+        } else if (p.mediaType === 'image') {
+            mediaContainer.innerHTML = `<img src="${p.mediaSrc}" alt="${p.title}">`;
+            mediaContainer.style.display = 'flex';
+        } else {
+            mediaContainer.innerHTML = '';
+            mediaContainer.style.display = 'none';
+        }
+
         document.getElementById('modalBackdrop').classList.add('active');
     }
 
     function hideModal() {
-        document.getElementById('modalBackdrop').classList.remove('active');
+        const backdrop = document.getElementById('modalBackdrop');
+        backdrop.classList.remove('active');
+        // Stop playing video in modal when closed
+        document.getElementById('modalMedia').innerHTML = '';
     }
 
     function closeModal(e) {
